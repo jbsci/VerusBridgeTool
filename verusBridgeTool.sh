@@ -120,12 +120,17 @@ fi
 ## Main program
 
 if [ "$estimate" = true ]; then
+    if [[ "$output_currency" == "bridge.vETH" ]] || [[ "$input_currency" == "bridge.vETH" ]]; then
 	data=$($verus estimateconversion "{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\" : \"$output_currency\"}")
 	echo $data | jq '.estimatedcurrencyout'
+    else
+	data=$($verus estimateconversion "{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\" : \"$output_currency\", \"via\" : \"bridge.vETH\"}")
+	echo $data | jq '.estimatedcurrencyout'
+    fi
 fi
 
 if [ "$convert" = true ]; then
-    if [[ "$output_currency" == "bridge.vETH" ]]; then
+    if [[ "$output_currency" == "bridge.vETH" ]] || [[ "$input_currency" == "bridge.vETH" ]]; then
         $verus sendcurrency "*" "[{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\": \"$output_currency\", \"address\" : \"$address\"}]" && echo "TRADE EXECUTED"
     else
 	$verus sendcurrency "*" "[{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\": \"$output_currency\", \"address\" : \"$address\", \"via\" : \"bridge.vETH\"}]" && echo "TRADE EXECUTED"
@@ -133,7 +138,7 @@ if [ "$convert" = true ]; then
 fi
 
 if [ -n "$target_amount" ]; then
-    if [[ $output_currency == "bridge.vETH" ]]; then
+    if [[ "$output_currency" == "bridge.vETH" ]] || [[ "$input_currency" == "bridge.vETH" ]]; then
 	until [ $(echo "$($verus estimateconversion "{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\": \"$output_currency\"}" | jq '.estimatedcurrencyout') >= $target_amount" | bc -l) -eq 1 ]; do
 		echo "Curretly less than threshold ($($verus estimateconversion "{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\": \"$output_currency\"}" | jq '.estimatedcurrencyout') vs $threshold). Sleeping..."
 		sleep 60
