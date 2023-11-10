@@ -14,7 +14,7 @@
 
 # Path to verus executable
 verus=
-# Desired address to use on the verus side, only required for target trading
+# Desired address to use on the verus side, not required if only wanting to do estimates
 address=
 # List of allowed currencies
 allowed_currencies="VRSC vETH MKR.vETH bridge.vETH"
