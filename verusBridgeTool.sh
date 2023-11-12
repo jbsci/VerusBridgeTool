@@ -138,9 +138,11 @@ fi
 
 if [ "$estimate" = true ]; then
     estimate_conversion
+fi
 
 if [ "$convert" = true ]; then
     send_currency
+fi
 
 if [ -n "$target_amount" ]; then
     until [ $(echo "$(estimate_conversion) >= $target_amount" | bc -l) -eq 1 ]; do
