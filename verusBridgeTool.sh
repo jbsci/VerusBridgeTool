@@ -9,15 +9,7 @@
 #
 # No warranty or guarantees given, use at your own risk.
 
-
-# # Constants
-
-# Path to verus executable
-verus=
-# Desired address to use on the verus side, not required if only wanting to do estimates
-address=
-# List of allowed currencies
-allowed_currencies="VRSC vETH MKR.vETH bridge.vETH"
+source ./bridgetool.conf
 
 # # Functions
 
