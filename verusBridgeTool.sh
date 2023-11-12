@@ -18,13 +18,16 @@ show_help() {
 	echo "Usage: $0 [options]"
 	echo ""
 	echo "Options:"
-	echo " 	-e		Gets estimate for currency exchange, cannot be used with -c and -t"
-	echo "  -c 		Performs conversion, cannot be used with -e and -t"
-	echo "	-t	VALUE	TARGET currency amount for exchange, cannot be used with -e and -c"
-	echo "  -a	VALUE	AMOUNT to be converted"
-	echo "	-i	VALUE	INPUT currency"
-	echo "	-o	VALUE	OUTPUT currency"
-        echo "  -h              Prints this help"
+	echo " 	-e		        Gets estimate for currency exchange, cannot be used with -c and -t"
+	echo "  -c 		        Performs conversion, cannot be used with -e and -t"
+	echo "	-t	VALUE	        TARGET currency amount for exchange, cannot be used with -e and -c"
+	echo "  -a	VALUE	        AMOUNT to be converted"
+	echo "	-i	VALUE	        INPUT currency"
+	echo "	-o	VALUE	        OUTPUT currency"
+        echo "  -l      VALUE           Lower limit for multi-limit values "
+        echo "  -u      VALUE           Upper limit for multi-limit values"
+        echo "  -b      VALUE           Limit block target. If the number of blocks set is exceeded AND the current exchange rate is higher than limit 1, but lower than limit 2 conversion is executed."
+        echo "  -h                      Prints this help"
 	echo ""
 }
 
@@ -45,6 +48,7 @@ check_currency_allowed() {
 	return 0
 }
 
+# Estimates currency conversion
 estimate_conversion() {
     if [[ $input_currency == "bridge.vETH" ]] || [[ $output_currency == "bridge.vETH" ]]; then
         data=$($verus estimateconversion "{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\" : \"$output_currency\"}")
@@ -54,6 +58,7 @@ estimate_conversion() {
     echo $data | jq '.estimatedcurrencyout'
 }
 
+# Performs conversion
 send_currency() {
     if [[ $input_currency == "bridge.vETH" ]] || [[ $output_currency == "bridge.vETH" ]]; then
         $verus sendcurrency "*" "[{\"currency\" : \"$input_currency\", \"amount\" : $amount, \"convertto\": \"$output_currency\", \"address\" : \"$addresss\"}]" && echo "TRADE EXECUTED"
@@ -63,54 +68,92 @@ send_currency() {
 }
 
 # # flags
+while [[ $# -gt 0 ]]; do
+    key="$1"
 
-while getopts ":t:i:o:a:ech" option; do
-	case $option in
-		t)
-			target_amount="$OPTARG"
-			;;
-
-		i)
-			input_currency="$OPTARG"
-			;;
-	  	o)
-			output_currency="$OPTARG"
-			;;
-		e)
-			estimate=true
-			;;
-		c)
-			convert=true
-			;;
-		a)
-			amount="$OPTARG"
-			;;
-		h)
-			show_help
-			exit 0
-			;;
-
-		\?)
-			echo "Invalid option: -$OPTART" >&2
-			exit 1
-			;;
-		:)
-			echo "Option -$OPTARG requires an argument." >&2
-			;;
-	esac
+    case $key in
+        -t)
+            target_amount=$2
+            shift # past argument
+            shift # past value
+            ;;
+        -i)
+            input_currency="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -o)
+            output_currency="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -e)
+            estimate=true
+            shift # past argument
+            ;;
+        -c)
+            convert=true
+            shift # past argument
+            ;;
+        -a)
+            amount=$2
+            shift # past argument
+            shift # past value
+            ;;
+        -l)
+            lower_limit=$2
+            shift # past argument
+            shift # past value
+            ;;
+        -u)
+            upper_limit=$2
+            shift # past argument
+            shift # past value
+            ;;
+        -h)
+            show_help
+            exit 0
+            ;;
+        *)    # unknown option
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
 done
 
-# Checks if trying to do a trade at a target value, do a single conversion, or make an estimate. Cannot do all at the same time.
+# Checks for any conflicting options
+if [ -n "$upper_limit" ] && [ ! -n "$lower_limit" ]; then
+        echo "You have to sepcify both a lower and upper limit"
+        exit 1
+fi
+if [ -n "$lower_limit" ] && [ ! -n "$upper_limit" ]; then
+        echo "You have to sepcify both a lower and upper limit"
+        exit 1
+fi
 if [ -n "$target_amount" ] && [ "$estimate" = true ]; then
 	echo "Please either choose a target or to get an estimate, but not both"
 	exit 1
 fi
-
+if [ -n "$lower_limit" ] && [ "$estimate" = true ]; then
+	echo "Please either choose a target or to get an estimate, but not both"
+	exit 1
+fi
 if [ -n "$target_amount" ] && [ "$convert" = true ]; then
 	echo "Please either choose a target or to do a conversion, but not both"
 	exit 1
 fi
-
+if [ -n "$lower_limit" ] && [ "$convert" = true ]; then
+	echo "Please either choose a target or to do a conversion, but not both"
+	exit 1
+fi
+if [ -n "$target_amount" ] && [ -n "$lower_limit" ]; then
+	echo "Cant set target and lower/upper limits"
+	exit 1
+fi
+if [ -n "$target_amount" ] && [ -n "$upper_limit" ]; then
+	echo "Cant set target and lower/upper limits"
+	exit 1
+fi
 if [ "$estimate" = true ] && [ "$convert" = true ]; then
 	echo "Please either choose do make an estimate or to do a conversion, but not both"
 	exit 1
@@ -119,15 +162,11 @@ fi
 if ! check_currency_allowed "$input_currency" "$allowed_currencies"; then
 	echo "Error: Invalid input currency"
 fi
-
-
 # Checks that the output currency is valid
 if ! check_currency_allowed "$output_currency" "$allowed_currencies"; then
 	echo "Error: Invalid input currency"
 fi
-
 ## Main program
-
 if [ "$estimate" = true ]; then
     estimate_conversion
 fi
