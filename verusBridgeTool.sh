@@ -139,7 +139,7 @@ fi
 if [ -n "$target_amount" ]; then
     until [ $(echo "$(estimate_conversion) >= $target_amount" | bc -l) -eq 1 ]; do
 		echo "Curretly less than threshold ($(estimate_conversion) vs $target_amount). Sleeping..."
-		sleep 60
+		sleep $target_rate
     done
     send_currency
 fi
