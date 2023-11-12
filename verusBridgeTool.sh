@@ -200,11 +200,12 @@ if [ -n "$lower_limit" ]; then
             send_currency
             exit 0
         else
+            echo "Currently less than upper limit of $upper_limit ($(estimate_conversion)), sleeping..."
             sleep $target_rate
             current_height=$($verus getinfo | jq '.blocks')
         fi
     until [ $(echo "$(estimate_conversion) >= $lower_limit" | bc -l) -eq 1 ]; do
-		echo "Curretly less than threshold ($(estimate_conversion) vs $lower_limit). Sleeping..."
+        echo "Block limit exceeded. Currently less than lower limit $lower_limit ($(estimate_conversion)). Sleeping..."
 		sleep $target_rate
     done
     send_currency
