@@ -191,3 +191,23 @@ if [ -n "$target_amount" ]; then
     done
     send_currency
 fi
+
+if [ -n "$lower_limit" ]; then
+    current_height=$($verus getinfo | jq '.blocks')
+    check_height=$(echo "$current_height + $number_blocks")
+    until [ $current_height -gt $check_height ]; 
+        if [ $(echo "$(estimate_conversion) >= $upper_limit" | bc -l) -eq 1 ]; then
+            send_currency
+            exit 0
+        else
+            sleep $target_rate
+            current_height=$($verus getinfo | jq '.blocks')
+        fi
+    until [ $(echo "$(estimate_conversion) >= $lower_limit" | bc -l) -eq 1 ]; do
+		echo "Curretly less than threshold ($(estimate_conversion) vs $lower_limit). Sleeping..."
+		sleep $target_rate
+    done
+    send_currency
+fi
+
+
