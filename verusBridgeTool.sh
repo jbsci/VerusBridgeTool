@@ -110,6 +110,11 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
             shift # past value
             ;;
+        -nblocks)
+            number_blocks=$2
+            shift # past argument
+            shift # past value
+            ;;
         -h)
             show_help
             exit 0
@@ -128,6 +133,10 @@ if [ -n "$upper_limit" ] && [ ! -n "$lower_limit" ]; then
 fi
 if [ -n "$lower_limit" ] && [ ! -n "$upper_limit" ]; then
         echo "You have to sepcify both a lower and upper limit"
+        exit 1
+fi
+if [ -n "$lower_limit" ] && [ ! -n "$number_blocks" ]; then
+        echo "Number of blocks to check must be given to use limits"
         exit 1
 fi
 if [ -n "$target_amount" ] && [ "$estimate" = true ]; then
