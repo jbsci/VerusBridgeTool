@@ -194,13 +194,14 @@ fi
 
 if [ -n "$lower_limit" ]; then
     current_height=$($verus getinfo | jq '.blocks')
+    echo "Starting to check at height $current_height"
     check_height=$(echo "$current_height + $number_blocks" | bc)
     until [ $current_height -gt $check_height ];  do
         if [ $(echo "$(estimate_conversion) >= $upper_limit" | bc -l) -eq 1 ]; then
             send_currency
             exit 0
         else
-            echo "Currently less than upper limit of $upper_limit ($(estimate_conversion)), sleeping..."
+            echo "Currently less than upper limit of $upper_limit ($(estimate_conversion)) at height $current_height, sleeping..."
             sleep $target_rate
             current_height=$($verus getinfo | jq '.blocks')
         fi
