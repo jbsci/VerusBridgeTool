@@ -194,7 +194,7 @@ fi
 
 if [ -n "$lower_limit" ]; then
     current_height=$($verus getinfo | jq '.blocks')
-    check_height=$(echo "$current_height + $number_blocks")
+    check_height=$(echo "$current_height + $number_blocks" | bc)
     until [ $current_height -gt $check_height ];  do
         if [ $(echo "$(estimate_conversion) >= $upper_limit" | bc -l) -eq 1 ]; then
             send_currency
