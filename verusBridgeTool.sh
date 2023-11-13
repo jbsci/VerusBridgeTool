@@ -96,7 +96,11 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
             ;;
         -a)
-            amount=$2
+            if [[ "$2" == "all" ]]; then
+                amount=$($verus getcurrencybalance "*" | jq ".$input_currency")
+            else
+                amount=$2
+            fi
             shift # past argument
             shift # past value
             ;;
