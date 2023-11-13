@@ -21,7 +21,7 @@ show_help() {
 	echo " 	-e		        Gets estimate for currency exchange, cannot be used with -c and -t"
 	echo "  -c 		        Performs conversion, cannot be used with -e and -t"
 	echo "	-t	VALUE	        TARGET currency amount for exchange, cannot be used with -e and -c"
-	echo "  -a	VALUE	        AMOUNT to be converted"
+	echo "  -a	VALUE	        AMOUNT to be converted, \"all\" for all available"
 	echo "	-i	VALUE	        INPUT currency"
 	echo "	-o	VALUE	        OUTPUT currency"
         echo "  -l      VALUE           Lower limit for multi-limit values "
@@ -205,7 +205,7 @@ if [ -n "$lower_limit" ]; then
             send_currency
             exit 0
         else
-            echo "Currently less than upper limit of $upper_limit ($(estimate_conversion)) at height $current_height, sleeping..."
+            echo "Currently less than upper limit of $upper_limit ($(estimate_conversion)) at height $current_height ($(echo "$check_height - $current_height" | bc) blocks to go), sleeping..."
             sleep $target_rate
             current_height=$($verus getinfo | jq '.blocks')
         fi
