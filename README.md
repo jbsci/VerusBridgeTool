@@ -4,10 +4,10 @@ Script to interface with the Verus-Ethereum bridge to streamline making estimate
 
 ### Configuration
 
-Set the parameters in the `bridgetool.conf` file:
+Set the parameters in the `bridgetool.conf` file, example:
 
 ```
-verus="/home/$user/bin/verus"
+verus="$HOME/bin/verus"
 address="RJeP52dSE3FZtE6NHcaZGYh6Qs1Vksmeq9"
 target_rate=60
 allowed_currencies="VRSC vETH MKR.vETH bridge.vETH DAI.vETH"
