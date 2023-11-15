@@ -25,7 +25,7 @@ allowed_currencies="VRSC vETH MKR.vETH bridge.vETH DAI.vETH"
 
 `./verusBridgeTool.sh -i VRSC -o vETH -a 100 -c`
 
-#### Make a conversion if a target conversion value is reached
+#### Make a conversion when a target conversion value is reached (check interval is set with the target_rate parameter in the config)
 
 `./verusBridgeTool.sh -i VRSC -o vETH -a 100 -t 0.1`
 
