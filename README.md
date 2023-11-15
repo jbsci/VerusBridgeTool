@@ -1,6 +1,8 @@
 # VerusBridgeTool
 
-Script to interface with the Verus-Ethereum bridge to streamline making estimates as well as trades/swaps.
+Script to interface with the Verus-Ethereum bridge to streamline making estimates and arbitrage. 
+
+Includes the ability to make "limit" trades.
 
 ### Configuration
 
