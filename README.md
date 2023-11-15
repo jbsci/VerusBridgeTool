@@ -33,7 +33,7 @@ In this example we're wanting to convert 100 VRSC to vETH when we'd be able to g
 
 #### Make a conversion if a target is reached, but you'd be fine with a lower rate if it reaches at least that after some number of blocks.
 
-In this example we're wanting to convert 100 VRSC into vETH, and we'd really like 0.1 vETH for it, but if after 100 blocks the best it is is 0.08 we'll take that instead. 
+In this example we're wanting to convert 100 VRSC into vETH, and we'd really like 0.1 vETH for it ([u]pper limit), but if after 100 blocks the best it is is 0.08 ([l]ower limit) we'll take that instead. 
 
 `./verusBridgeTool.sh -i VRSC -o vETH -a 100 -l 0.08 -u 0.1 -nblocks 100`
 
