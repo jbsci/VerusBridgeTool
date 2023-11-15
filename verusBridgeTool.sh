@@ -174,10 +174,12 @@ fi
 # Checks that the input currency is valid
 if ! check_currency_allowed "$input_currency" "$allowed_currencies"; then
 	echo "Error: Invalid input currency"
+        exit 1
 fi
 # Checks that the output currency is valid
 if ! check_currency_allowed "$output_currency" "$allowed_currencies"; then
-	echo "Error: Invalid input currency"
+	echo "Error: Invalid output currency"
+        exit 1
 fi
 ## Main program
 if [ "$estimate" = true ]; then
