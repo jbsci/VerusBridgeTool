@@ -20,7 +20,7 @@ Some basic usage:
 
 #### Make a conversion if a target conversion value is reached
 
-`./verusBridgeTool.sh -i VRSC -o vETH -a 100 -t 0.1
+`./verusBridgeTool.sh -i VRSC -o vETH -a 100 -t 0.1`
 
 #### Make a conversion if a target is reached, but you'd be fine with a lower rate if it reaches at least that after 100 blocks
 
