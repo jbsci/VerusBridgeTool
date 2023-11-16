@@ -28,6 +28,7 @@ show_help() {
         echo "  -u      VALUE           Upper limit for multi-limit values"
         echo "  -b      VALUE           Limit block target. If the number of blocks set is exceeded AND the current exchange rate is higher than limit 1, but lower than limit 2 conversion is executed."
         echo "  -h                      Prints this help"
+        echo "  -sim    VALUE           Simulates arbitrage for n blocks"
 	echo ""
 }
 
@@ -116,6 +117,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         -nblocks)
             number_blocks=$2
+            shift # past argument
+            shift # past value
+            ;;
+        -sim)
+            sim_blocks=$2
             shift # past argument
             shift # past value
             ;;
@@ -219,5 +225,23 @@ if [ -n "$lower_limit" ]; then
     done
     send_currency
 fi
+if [ -n "$sim_blocks" ]; then
+    init_swap=$(estimate_conversion)
+    old_input="$input_currency"
+    old_output="$output_currency"
+    input_currency="$old_output"
+    output_currency="$old_input"
+    start_amount="$amount"
+    amount="$init_swap"
+    start_height=$($verus getinfo | jq '.blocks')
+    end_height=$(echo "$start_height + $sim_blocks" | bc)
+    until [ $($verus getinfo | jq '.blocks') -ge $end_height ]; do
+        current_est=$(estimate_conversion)
+        echo "You could've had $current_est VRSC"
+        sleep $target_rate
+    done
+fi
+
+
 
 
