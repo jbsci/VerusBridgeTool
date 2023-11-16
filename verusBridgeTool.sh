@@ -121,7 +121,7 @@ while [[ $# -gt 0 ]]; do
             shift # past value
             ;;
         -sim)
-            sim_blocks=$2
+            sim=true
             shift # past argument
             shift # past value
             ;;
@@ -190,10 +190,12 @@ fi
 ## Main program
 if [ "$estimate" = true ]; then
     estimate_conversion
+    exit 0
 fi
 
 if [ "$convert" = true ]; then
     send_currency
+    exit 0
 fi
 
 if [ -n "$target_amount" ]; then
@@ -202,6 +204,7 @@ if [ -n "$target_amount" ]; then
 		sleep $target_rate
     done
     send_currency
+    exit 0
 fi
 
 if [ -n "$lower_limit" ]; then
@@ -224,8 +227,9 @@ if [ -n "$lower_limit" ]; then
 		sleep $target_rate
     done
     send_currency
+    exit 0
 fi
-if [ -n "$sim_blocks" ]; then
+if [ "$sim" = true ]; then
     init_swap=$(estimate_conversion)
     old_input="$input_currency"
     old_output="$output_currency"
@@ -233,11 +237,11 @@ if [ -n "$sim_blocks" ]; then
     output_currency="$old_input"
     start_amount="$amount"
     amount="$init_swap"
-    start_height=$($verus getinfo | jq '.blocks')
-    end_height=$(echo "$start_height + $sim_blocks" | bc)
-    until [ $($verus getinfo | jq '.blocks') -ge $end_height ]; do
+    while true; do
         current_est=$(estimate_conversion)
-        echo "You could've had $current_est VRSC"
+        delta=$(echo "$current_est - $start_amount" | bc)
+        echo "Initial $start_amount of $old_input converted to $init_swap $old_output."
+        echo "If you converted that back, you'd have $current_est (delta of $delta)"
         sleep $target_rate
     done
 fi
