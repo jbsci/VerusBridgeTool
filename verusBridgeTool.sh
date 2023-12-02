@@ -137,6 +137,7 @@ while [[ $# -gt 0 ]]; do
             gaslimit=$2
             shift # past argument
             shift # past value
+            ;;
         -h)
             show_help
             exit 0
