@@ -26,9 +26,12 @@ show_help() {
 	echo "	-o	VALUE	        OUTPUT currency"
         echo "  -l      VALUE           Lower limit for multi-limit values "
         echo "  -u      VALUE           Upper limit for multi-limit values"
+        echo " --nblocks VALUE          Number of blocks to wait before switching from higher to lower limit"
         echo "  -b      VALUE           Limit block target. If the number of blocks set is exceeded AND the current exchange rate is higher than limit 1, but lower than limit 2 conversion is executed."
         echo "  -h                      Prints this help"
-        echo "  -sim    VALUE           Simulates arbitrage for n blocks"
+        echo " --sim    VALUE           Simulates arbitrage for n blocks"
+        echo " --export VALUE           exports a specific currency to ETH specified by the amount in -a"
+        echo " --gaslimit VALUE     threshold in gwei, defaults to 25"
 	echo ""
 }
 
@@ -115,16 +118,25 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
             shift # past value
             ;;
-        -nblocks)
+        --nblocks)
             number_blocks=$2
             shift # past argument
             shift # past value
             ;;
-        -sim)
+        --sim)
             sim=true
             shift # past argument
             shift # past value
             ;;
+        --export)
+            export=$2
+            shift # past argument
+            shift # past value
+            ;;
+        --gaslimit)
+            gaslimit=$2
+            shift # past argument
+            shift # past value
         -h)
             show_help
             exit 0
@@ -244,7 +256,13 @@ if [ "$sim" = true ]; then
         echo "If you converted that back, you'd have $current_est (delta of $delta)"
         sleep $target_rate
     done
+    exit 0
 fi
+if [ -n "$export" ]; then
+    #TODO Add export support
+    echo "Nothing here yet"
+fi
+
 
 
 
